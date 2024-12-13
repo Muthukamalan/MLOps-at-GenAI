@@ -1,0 +1,89 @@
+services:
+  torchservers:
+    container_name: ctorchserve
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.torchserve
+    ports:
+    - "8080:8080"
+    - "8081:8081"
+    - "8082:8082"
+    command: torchserve --start --ts-config=config.properties --model-store model_store --models sd3=sd3.mar --disable-token-auth --ncs --enable-model-api --foreground
+    networks:
+      - sd3_networks
+    
+  middleware:
+    env_file:
+      - .env
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      TORCHSERVE_MANAGEMENT_API: http://ctorchserve:8081
+      TORCHSERVE_INFERENCE_API: http://ctorchserve:8080
+    container_name: cfastapi
+    depends_on:
+      - "torchservers"
+    build: 
+      context: ./middleware
+      dockerfile: Dockerfile.fastapi
+    ports:
+      - "9080:9080"
+    command: ['python',"app.py"]
+    networks:
+      - sd3_networks
+   
+  prometheus:
+    depends_on:
+      - "torchservers"
+    image: prom/prometheus
+    hostname: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    volumes:
+      - prometheus-data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    restart: on-failure
+    networks:
+      - sd3_networks
+
+  grafana:
+    depends_on:
+      - "prometheus"
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3001:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin!
+    volumes:
+      - ./grafana:/etc/grafana/provisioning/datasources
+    networks:
+      - sd3_networks
+
+
+  frontend:
+    environment:
+      NEXT_PUBLIC_BACKEND_URL: http://cfastapi:9080
+    depends_on:
+      - "torchservers"
+      - "middleware"
+    container_name: cnextjs 
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.next
+    ports:
+      - "3000:3000"
+    command: "npm run dev"
+    networks:
+      - sd3_networks
+
+volumes:
+  prometheus-data:
+
+networks:
+  sd3_networks:
+    driver: bridge

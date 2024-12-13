@@ -1,0 +1,102 @@
+[project]
+name = "StableDiffusion Deploy"
+description = "MLOps at GenAi"
+authors = [{name = "Muthu Kamalan", email = "muthukamalan98@gmail.com"}]
+license = {text = "MIT"}
+classifiers = [
+  "Development Status :: 1 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Machine Learning",
+  "Topic :: Stable Diffusion",
+  "Topic :: MLOps",
+  "Typing :: Typed",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "nvgpu==0.10.0",
+    "protobuf==5.29.1",
+    "torch==2.5.1+cu121",
+    # "torch-model-archiver==0.12.0",
+    # "torch-workflow-archiver==0.2.15",
+    "torchserve==0.12.0",
+    "torchvision==0.20.1+cu121",
+    "transformers==4.47.0",
+    "diffusers==0.31.0",
+    "accelerate==1.2.0",
+    "aiobotocore==2.15.2",
+    "boto3==1.35.36",
+    "botocore==1.35.36",
+    "prometheus_client==0.21.1",
+    "uvicorn==0.32.1",
+    "requests==2.32.3",
+    "numpy==1.26.3",
+    "pillow==10.2.0",
+    "fastapi==0.115.6"
+
+]
+dynamic = ["version"]
+
+[tool.ruff]
+line-length = 99
+target-version = "py38"
+fix = true
+
+extend-exclude = [
+  "@*",
+  # Sphinx configuration is irrelevant
+  "docs/source/conf.py",
+  "mypyc/doc/conf.py",
+  # tests have more relaxed styling requirements
+  # fixtures have their own .pyi-specific configuration
+  "test-data/*",
+  "mypyc/test-data/*",
+  # typeshed has its own .pyi-specific configuration
+  "mypy/typeshed/*",
+]
+
+[tool.ruff.lint]
+select = [
+  "E",       # pycodestyle (error)
+  "F",       # pyflakes
+  "W",       # pycodestyle (warning)
+  "B",       # flake8-bugbear
+  "I",       # isort
+  "N",       # pep8-naming
+  "RUF100",  # Unused noqa comments
+  "PGH004",  # blanket noqa comments
+  "UP",      # pyupgrade
+  "C4",      # flake8-comprehensions
+  "SIM201", "SIM202",  # simplify comparisons involving not
+  "ISC001",  # implicitly concatenated string
+  "RET501", "RET502",  # better return None handling
+]
+
+ignore = [
+  "B007",  # Loop control variable not used within the loop body.
+  "B011",  # Don't use assert False
+  "B023",  # Function definition does not bind loop variable
+  "E2",    # conflicts with black
+  "E402",  # module level import not at top of file
+  "E501",  # conflicts with black
+  "E721",  # Use `is` and `is not` for type comparisons, or `isinstance()` for isinstance checks
+  "E731",  # Do not assign a `lambda` expression, use a `def`
+  "E741",  # Ambiguous variable name
+  "N818",  # Exception should be named with an Error suffix
+  "N806",  # UPPER_CASE used for constant local variables
+  "UP031", # Use format specifiers instead of percent format
+  "UP032", # 'f-string always preferable to format' is controversial
+  "C416",  # There are a few cases where it's nice to have names for the dict items
+]
+
+unfixable = [
+    "F841",  # unused variable. ruff keeps the call, but mostly we want to get rid of it all
+    "F601",  # automatic fix might obscure issue
+    "F602",  # automatic fix might obscure issue
+    "B018",  # automatic fix might obscure issue
+    "UP036", # sometimes it's better to just noqa this
+]

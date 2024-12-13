@@ -1,0 +1,6 @@
+FROM python:3.11.11-slim-bullseye
+WORKDIR /workspace
+COPY requires.txt .
+RUN pip3 install -r requires.txt --no-cache-dir
+COPY . .
+CMD [ "python" ,'app.py']
