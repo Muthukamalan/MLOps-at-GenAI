@@ -1,0 +1,14 @@
+ --index-url https://download.pytorch.org/whl/cu121
+nvgpu==0.10.0
+protobuf==5.29.1
+torch==2.5.1+cu121
+# torch-model-archiver==0.12.0
+# torch-workflow-archiver==0.2.15
+torchserve==0.12.0
+torchvision==0.20.1+cu121
+transformers==4.47.0
+diffusers==0.31.0
+accelerate==1.2.0
+aiobotocore==2.15.2
+boto3==1.35.36
+botocore==1.35.36
